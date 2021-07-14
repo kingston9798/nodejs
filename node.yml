@@ -3,9 +3,6 @@ version: '3.3'
 services:
   nodejs:
     image: testnodejs
-    ports:
-     - "3050:3050"
-     - "8081:8080"
     networks:
      - proxy
     deploy:
