@@ -3,21 +3,24 @@ version: '3.3'
 services:
   nodejs:
     image: testnodejs
+    ports:
+      - 3050:3050
     networks:
-     - proxy
+     - traefik-public
     deploy:
         labels:
           - "traefik.enable=true"
-          - "traefik.http.routers.nodejs.rule=Host(`nodejs.ddnsking.com`) && Path(`/api`)"
+          - "traefik.constraint-label=traefik-public"
+          - "traefik.http.routers.nodejs.rule=Host(`devopstest.ddns.net`) && Path(`/api`)"
           - "traefik.http.routers.nodejs.tls=true"
-          - "traefik.http.routers.nodejs.tls.certresolver=default"
-          - "traefik.http.routers.nodejs.entryPoints=web"
-          - "traefik.http.routers.nodejs.service=nodejs-service"
-          - "traefik.http.services.nodejs-service.loadbalancer.server.port=3050"
-          - "traefik.docker.network=proxy"
+          - "traefik.http.routers.nodejs.tls.certresolver=le"
+          - "traefik.http.routers.nodejs.entryPoints=https"
+          - "traefik.http.routers.nodejs.service=nodejs"
+          - "traefik.http.services.nodejs.loadbalancer.server.port=3050"
+          - "traefik.docker.network=traefik-public"
 
 
 
 networks:
-    proxy:
+    traefik-public:
        external: true

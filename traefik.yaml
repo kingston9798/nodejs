@@ -1,56 +1,54 @@
-version: '3.7'
+version: '3.3'
+
 services:
-      traefik:
-        image: traefik:v2.2
-        command:
-          - "--api=true"
-          - "--api.dashboard=true"
-          - "--metrics=true"
-          - "--metrics.prometheus.buckets=0.1,0.3,1.2,5.0"
-          - "--providers.docker=true"
-          - "--providers.docker.exposedbydefault=false"
-          - "--providers.docker.swarmMode=true"
-          - "--providers.docker.network=http"
-          - "--entrypoints.web.address=:80"
-          - "--entrypoints.websecure.address=:443"
-          - "--certificatesresolvers.default.acme.email=kingston.9798@gmail.com"
-          - "--certificatesresolvers.default.acme.storage=/acme.json"
-          - "--certificatesresolvers.default.acme.tlschallenge=true"
-        ports:
-          - 8080:8080
-          - 80:80
-          - 443:443
-        deploy:
-          placement:
-             constraints:
-                 - node.role == manager
-          replicas: 1
-          update_config:
-            parallelism: 2
-            delay: 10s
-          restart_policy:
-            condition: on-failure
-          labels:
-            # Dashboard
-            - "traefik.enable=true"
-            - "traefik.docker.network=proxy"
-            - "traefik.http.routers.traefik.rule=Host(`nodejs.ddnsking.com`)"
-            - "traefik.http.routers.traefik.service=api@internal"
-            - "traefik.http.routers.traefik.tls.certresolver=default"
-            - "traefik.http.routers.traefik.entrypoints=websecure"
-            - "traefik.http.routers.traefik.middlewares=authtraefik"
-            - "traefik.http.middlewares.authtraefik.basicauth.users=admin:$$apr1$$PJrX.uKa$$V0bG6h9jj4kNppfoXWG6b/"
-            - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-            # global redirect to https
-            - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
-            - "traefik.http.routers.http-catchall.entrypoints=web"
-            - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-            # middleware redirect
-            - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-        volumes:
-           - /var/run/docker.sock:/var/run/docker.sock
-           - ./acme.json:/etc/traefik/acme.json
+   traefik:
+      image: traefik:v2.2
+      ports:
+        - 80:80
+        - 443:443
+      deploy:
+        placement:
+          constraints:
+            - node.labels.traefik-public.traefik-public-certificates == true
+        labels:
+          - traefik.enable=true
+          - traefik.docker.network=traefik-public
+          - traefik.constraint-label=traefik-public
+          - traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$PJrX.uKa$$V0bG6h9jj4kNppfoXWG6b/
+          - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+          - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+          - traefik.http.routers.traefik-public-http.rule=Host(`devopstest.ddns.net`)
+          - traefik.http.routers.traefik-public-http.entrypoints=http
+          - traefik.http.routers.traefik-public-http.middlewares=https-redirect
+          - traefik.http.routers.traefik-public-https.rule=Host(`devopstest.ddns.net`)
+          - traefik.http.routers.traefik-public-https.entrypoints=https
+          - traefik.http.routers.traefik-public-https.tls=true
+          - traefik.http.routers.traefik-public-https.service=api@internal
+          - traefik.http.routers.traefik-public-https.tls.certresolver=le
+          - traefik.http.routers.traefik-public-https.middlewares=admin-auth
+          - traefik.http.services.traefik-public.loadbalancer.server.port=8080
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - traefik-public-certificates:/certificates
+      command:
+        - --providers.docker=true
+        - --providers.docker.constraints=Label(`traefik.constraint-label`, `traefik-public`)
+        - --providers.docker.exposedbydefault=false
+        - --providers.docker.swarmmode=true
+        - --entrypoints.http.address=:80
+        - --entrypoints.https.address=:443
+        - --certificatesresolvers.le.acme.email=admin@devopstest.ddns.net
+        - --certificatesresolvers.le.acme.storage=/certificates/acme.json
+        - --certificatesresolvers.le.acme.tlschallenge=true
+        - --accesslog
+        - --log
+        - --api=true
+      networks:
+        - traefik-public
+volumes:
+  traefik-public-certificates:
+
 networks:
-  proxy:
+  traefik-public:
     external: true
 
