@@ -1,0 +1,20 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        "build",
+        "-t",
+        "gcr.io/bold-guide-319308/github.com/kingston9798/nodejs:$COMMIT_SHA",
+        ".",
+      ]
+
+
+ # push the artifact to a GCR repository
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/bold-guide-319308/github.com/kingston9798/nodejs:$COMMIT_SHA"]
+
+  - name: 'gcr.io/$PROJECT_ID/ansible'
+    args: ['--version']
+ # deploy image to vm
+ #- name: "gcr.io/cloud-builders/""
+

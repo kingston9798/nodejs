@@ -11,15 +11,16 @@ services:
         labels:
           - "traefik.enable=true"
           - "traefik.constraint-label=traefik-public"
-          - "traefik.http.routers.nodejs.rule=Host(`devopstest.ddns.net`) && Path(`/api`)"
+          - "traefik.http.routers.nodejs.rule=Host(`devopstest.ddns.net`) && PathPrefix(`/api`)"
           - "traefik.http.routers.nodejs.tls=true"
           - "traefik.http.routers.nodejs.tls.certresolver=le"
           - "traefik.http.routers.nodejs.entryPoints=https"
           - "traefik.http.routers.nodejs.service=nodejs"
           - "traefik.http.services.nodejs.loadbalancer.server.port=3050"
           - "traefik.docker.network=traefik-public"
-
-
+          - "traefik.http.middlewares.strip-nodejs.stripprefix.prefixes=/api"
+          - "traefik.http.middlewares.strip-nodejs.stripprefix.forceSlash=false"
+          - "traefik.http.routers.nodejs.middlewares=strip-nodejs"
 
 networks:
     traefik-public:
