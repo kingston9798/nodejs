@@ -19,8 +19,8 @@ steps:
     args:
       [
         " -i",
-        "host"
-        "deploy.yaml"
+        "host",
+        "deploy.yaml",
         "--extra-vars ssh_pass=$ssh_pass docer_image=$'gcr.io/bold-guide-319308/github.com/kingston9798/nodejs:$COMMIT_SHA'",
       ]
     env:
