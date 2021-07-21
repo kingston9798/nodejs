@@ -13,8 +13,9 @@ steps:
   - name: "gcr.io/cloud-builders/docker"
     args: ["push", "gcr.io/bold-guide-319308/github.com/kingston9798/nodejs:$COMMIT_SHA"]
 
-  - name: 'gcr.io/$PROJECT_ID/ansible'
-    args: ['--version']
- # deploy image to vm
- #- name: "gcr.io/cloud-builders/""
+ # update image
+  - name: "ansible"
+    entrypoint: ansible
+    args:
+      ["--version"]
 
