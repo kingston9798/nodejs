@@ -15,7 +15,6 @@ steps:
 
  # update image
   - name: "gcr.io/bold-guide-319308/ansible"
-    entrypoint: "/usr/bin/ansible"
     args:
       [
         "-i",
