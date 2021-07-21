@@ -18,8 +18,8 @@ steps:
     args:
       [
         "-i",
-        "host",
-        "deploy.yaml",
+        "/app/host",
+        "/app/deploy.yaml",
         "--extra-vars 'ssh_pass=$ssh_pass docker_image=gcr.io/bold-guide-319308/github.com/kingston9798/nodejs:$COMMIT_SHA'",
         "-vv",
       ]
