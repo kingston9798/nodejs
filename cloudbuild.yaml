@@ -14,8 +14,15 @@ steps:
     args: ["push", "gcr.io/bold-guide-319308/github.com/kingston9798/nodejs:$COMMIT_SHA"]
 
  # update image
-  - name: "ansible"
-    entrypoint: ansible
+  - name: "gcr.io/bold-guide-319308/ansible"
+    entrypoint: "/usr/bin/ansible
     args:
-      ["--version"]
+      [
+      " -i",
+      "host"
+      "deploy.yaml"
+      "--extra-vars ssh_pass=$ssh_pass docer_image=$'gcr.io/bold-guide-319308/github.com/kingston9798/nodejs:$COMMIT_SHA'"
+      ]
+    env:
+      - "ssh_pass=${_SSH_KEY}"
 
