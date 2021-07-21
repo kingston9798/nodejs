@@ -15,11 +15,11 @@ steps:
 
  # update image
   - name: "gcr.io/bold-guide-319308/ansible"
-    entrypoint: "sh"
+    entrypoint: "ansible-playbook"
     args:
-    - -c
-    - pwd
-    - sh ./run.sh  $_SSH_PASS $COMMIT_SHA
+    - -i /app/host
+    - /app/deploy.yaml --extra-vars "ssh_pass=$_SSH_PASS docker_image=gcr.io/bold-guide-319308/github.com/kingston9798/nodejs:$COMMIT_SHA"
+    - -vv
     env:
       - "ANSIBLE_HOST_KEY_CHECKING=False"
 
