@@ -18,7 +18,7 @@ steps:
     entrypoint: "sh"
     args:
     - -c
-    - cd /app
+    - pwd
     - sh ./run.sh  $_SSH_PASS $COMMIT_SHA
     env:
       - "ANSIBLE_HOST_KEY_CHECKING=False"
